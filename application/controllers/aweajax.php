@@ -48,6 +48,7 @@ class Aweajax extends Nova_ajax {
 		//get the rosters again:
 
 		$manifests = $this->dept->get_all_manifests();
+		unset($totals);
 		
 		if ($manifests->num_rows() > 0) {
 			if ($manifests->num_rows() > 1) {
@@ -150,7 +151,13 @@ class Aweajax extends Nova_ajax {
 																if (($this->user->get_loa($char->user) == 'loa') || ($this->user->get_loa($char->user) == 'eloa')) {
 																	$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['logcount'] = $this->user->get_loa($char->user);
 																} else {
-																	$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['logcount'] = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
+//																	$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['logcount'] = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
+																	$logcount = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
+																	$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['logcount'] = $logcount;
+																	//add to totals:
+																	foreach ($logcount as $key => $value) {
+																		$totals[$key] += $value;
+																	}
 																}
 															}
 															if (!isset($logDates)) {
@@ -224,8 +231,12 @@ class Aweajax extends Nova_ajax {
 														if (($this->user->get_loa($char->user) == 'loa') || ($this->user->get_loa($char->user) == 'eloa')) {
 															$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['logcount'] = $this->user->get_loa($char->user);
 														} else {
-															$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['logcount'] = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
-															
+															$logcount = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
+															$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['logcount'] = $logcount;
+															//add to totals:
+															foreach ($logcount as $key => $value) {
+																$totals[$key] += $value;
+															}
 														}
 													}
 													if (!isset($logDates)) {
@@ -248,9 +259,8 @@ class Aweajax extends Nova_ajax {
 	//END ROSTER!
 
 	/** LOGCOUNT VIEW! **/
+			ksort($totals);
 
-
-	/** END LOGCOUNT VIEW **/
 ?>
 <style type="text/css">
 body, table {
@@ -302,6 +312,14 @@ td.subdept {
 	font-size: 12px;
 	font-weight: bold;
 	text-align: center;
+}
+tr.totals {
+	margin:0px;
+	padding:0px 2px;
+	font-size: 16px;
+	font-weight: bold;
+	text-align: right;
+	background-color: #cfcfcf;
 }
 
 td.lowlimit {
@@ -407,6 +425,15 @@ td.lowlimit {
 
 				
 		<?php endforeach; //manifests ?>
+		<tr class="totals">
+			<td colspan='2' valign="right">Total:</td>
+		<?php
+			// SHOW TOTALS:
+			foreach ($totals as $key => $value) { ?>
+				<td><?php echo $value; ?></td>
+<?			}
+?>
+		</tr>
 		</table>
 		<?php endif; //manifests ?>
 	
