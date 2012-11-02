@@ -7,12 +7,11 @@
 
 $(document).ready(function(){
 //	$('table.zebra tbody > tr:nth-child(odd)').addClass('alt');
-	
 	var dates = $( "#txtReportDateStart" ).datepicker({
 			defaultDate: "+1w",
 			changeMonth: true,
 			numberOfMonths: 1,
-			dateFormat: 'm/d/yy', 
+			dateFormat: 'M d, yy',/*'m/d/yy', */
 			onSelect: function( selectedDate ) {
 				var option = this.id == "txtReportDateStart" ? "minDate" : "maxDate",
 					instance = $( this ).data( "datepicker" ),

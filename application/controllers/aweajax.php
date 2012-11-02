@@ -294,6 +294,10 @@ td.subdept {
 	font-weight: bold;
 	text-align: center;
 }
+
+td.lowlimit {
+	color: #E01B1B;
+}
 </style>
 
 	<?php if (isset($roster['manifest'])): ?>
@@ -333,8 +337,11 @@ td.subdept {
 													<strong class="fontMedium"><?php echo $char['name'];?></strong><br />
 													<?php echo $pos['name'];?>
 												</td>
-<?php 											foreach ($char['logcount'] as $key => $lc) { ?>
-													<td class="col_75 align_right">
+<?php 											foreach ($char['logcount'] as $key => $lc) { 
+													$countstyle ='';
+													if ($lc == 0) { $countstyle = 'lowlimit'; }
+?>
+													<td class="col_75 align_right <?php echo $countstyle;?>">
 														<?php echo $lc; ?>
 													</td>
 <?php											} ?>
@@ -365,8 +372,11 @@ td.subdept {
 															<strong class="fontMedium"><?php echo $char['name'];?></strong><br />
 															<?php echo $spos['name'];?>
 														</td>
-		<?php 											foreach ($char['logcount'] as $key => $lc) { ?>
-															<td class="col_75 align_right">
+		<?php 											foreach ($char['logcount'] as $key => $lc) { 
+															$countstyle ='';
+															if ($lc == 0) { $countstyle = 'lowlimit'; }
+		?>
+															<td class="col_75 align_right <?php echo $countstyle; ?>">
 																<?php echo $lc; ?>
 															</td>
 		<?php											} ?>

@@ -67,7 +67,7 @@ class Awesimreport extends Nova_admin {
 				'style' => 'width:150px;',
 				'name' => 'txtReportDateStart',
 				'id' => 'txtReportDateStart',
-				'value' => $inputVal['txtReportDateStart']),
+				'value' => date("M j, Y")),
 			'txtReportDuration' => array(
 				'style' => 'width:150px;',
 				'name' => 'txtReportDuration',

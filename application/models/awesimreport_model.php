@@ -35,7 +35,22 @@ class Awesimreport_model extends CI_Model {
 			$query = $this->db->query($rawquery);
 
 			$postnum[$en_date] = $query->num_rows();
-
+/*			//if 0, check if user was on loa:
+			if ($postnum[$en_date] == 0) {
+				$this->db->select('loa');
+				$this->db->from('users');
+				$this->db->where('userid', $id);
+				$loaquery = $this->db->get();
+				
+				if ($loaquery->num_rows() > 0)
+				{
+					$row = $loaquery->row();
+					if ($row->loa) {
+						$postnum[$en_date] = $row->loa;
+					}
+				}
+			}
+*/
 			$en_date = $st_date;
 			$st_date = $st_date - $duration;
 			unset($querystr);
