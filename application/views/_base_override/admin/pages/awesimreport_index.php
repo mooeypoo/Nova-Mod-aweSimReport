@@ -1,3 +1,15 @@
+<?php
+/*
+|---------------------------------------------------------------
+| aweSimReport Log-Count GUI
+|---------------------------------------------------------------
+|
+| File: views/_base_override/admin/pages/awesimreport_index.php
+| System Version: Nova 2.0
+| Author: Moriel Schottlender, 2012
+|
+*/
+?>
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');?>
 
 <div id='ajaxnotice' class='hidden'></div>

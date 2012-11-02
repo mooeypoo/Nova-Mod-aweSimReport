@@ -1,12 +1,15 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-/**
- * SEO controller
- *
- * @package		Nova
- * @category	Controller
- * @author		Moriel Schottlender
- * @copyright	2012 Moriel Schottlender GNU
- */
+
+/*
+|---------------------------------------------------------------
+| aweSimReport Controller
+|---------------------------------------------------------------
+|
+| File: controllers/awesimreport.php
+| System Version: Nova 2.0
+| Author: Moriel Schottlender, 2012
+|
+*/
 
 require_once MODPATH.'core/controllers/nova_admin.php';
 

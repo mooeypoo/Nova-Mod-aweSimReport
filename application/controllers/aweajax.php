@@ -1,3 +1,15 @@
+<?php
+/*
+|---------------------------------------------------------------
+| aweSimReport ajax Controller
+|---------------------------------------------------------------
+|
+| File: controllers/aweajax.php
+| System Version: Nova 2.0
+| Author: Moriel Schottlender, 2012
+|
+*/
+?>
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once MODPATH.'core/controllers/nova_ajax.php';

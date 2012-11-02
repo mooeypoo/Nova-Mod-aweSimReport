@@ -1,3 +1,15 @@
+<?php
+/*
+|---------------------------------------------------------------
+| aweSimReport Javascript for Log-Count GUI 
+|---------------------------------------------------------------
+|
+| File: views/_base_override/admin/js/awesimreport_index_js.php
+| System Version: Nova 2.0
+| Author: Moriel Schottlender, 2012
+|
+*/
+?>
 <?php $string = random_string('alnum', 8);?>
 
 <script type="text/javascript" src="<?php echo base_url() . APPFOLDER;?>/assets/js/jquery.ui.datepicker.min.js"></script>

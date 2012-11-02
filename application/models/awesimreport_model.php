@@ -6,7 +6,7 @@
 |
 | File: models/awesimreport_model.php
 | System Version: 2.0
-| Author: Moriel Schottlender
+| Author: Moriel Schottlender, 2012
 |
 */
 
