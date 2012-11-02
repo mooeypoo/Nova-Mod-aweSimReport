@@ -28,6 +28,50 @@ class Awesimreport extends Nova_admin {
 		$this->load->model('personallogs_model', 'logs');
 		$this->load->model('posts_model', 'posts');
 		$this->load->model('awesimreport_model', 'awe');
+
+/*
+		$data['images']['loading'] = array(
+			'src' => img_location('loading-bar.gif', $this->skin, 'admin'),
+			'alt' => 'Loading',
+			'class' => 'image'
+		);
+		*/
+		$seloptions = array(
+                  '1'  => '1 Day',
+                  '2'  => '2 Days',
+                  '3'  => '3 Days',
+                  '4'  => '4 Days',
+                  '5'  => '5 Days',
+                  '6'  => '6 Days',
+                  '7'  => '1 Week',
+                  '8'  => '8 Days',
+                  '9'  => '9 Days',
+                  '10'  => '10 Days',
+                  '14'  => '2 Weeks',
+                  '30'  => '30 Days',
+                );
+		$seloptions2 = array(
+                  '1'  => '1',
+                  '2'  => '2',
+                  '3'  => '3',
+                  '4'  => '4',
+                  '5'  => '5',
+				);
+		
+		$data['inputs'] = array(
+			'txtReportDateStart' => array(
+				'style' => 'width:150px;',
+				'name' => 'txtReportDateStart',
+				'id' => 'txtReportDateStart',
+				'value' => $inputVal['txtReportDateStart']),
+			'txtReportDuration' => array(
+				'style' => 'width:150px;',
+				'name' => 'txtReportDuration',
+				'id' => 'txtReportDuration',
+				'value' => $inputVal['txtReportDuration']),
+			'selReportDuration' => $seloptions,
+			'selBackwardsCount' => $seloptions2,
+		);
 		
 		//Get all manifests:
 		$manifests = $this->dept->get_all_manifests();
@@ -122,12 +166,18 @@ class Awesimreport extends Nova_admin {
 															// don't do anything
 														} else {
 															//GET LOG COUNT:
-															$postlist = $awe->get_user_posts($char->user);
+															//$postlist = $awe->count_user_posts($char->user);
 															// set the data for the characters in a position in a sub dept
 															$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['char_id'] = $char->charid;
 															$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['name'] = $name;
 															$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['rank_img'] = $rank_img;
 															$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['crew_type'] = $char->crew_type;
+															$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['inpcheck'] = array(
+																																											'name' => 'chkCount',
+																																											'id' => 'chkCount',
+																																											'value' => $char->charid,
+																																											'checked' => TRUE,
+																																											);
 			//												$data['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['combadge'] = $cb_img;
 															
 															++$c;
@@ -209,6 +259,12 @@ class Awesimreport extends Nova_admin {
 													$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['name'] = $name;
 													$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['rank_img'] = $rank_img;
 													$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['crew_type'] = $char->crew_type;
+													$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['inpcheck'] = array(
+																																						'name' => 'chkCount',
+																																						'id' => 'chkCount',
+																																						'value' => $char->charid,
+																																						'checked' => TRUE,
+																																						);
 			//										$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['combadge'] = $cb_img;
 													
 													++$c;

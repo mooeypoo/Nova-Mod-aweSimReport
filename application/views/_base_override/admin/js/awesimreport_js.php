@@ -1,0 +1,1 @@
+<?php $string = random_string('alnum', 8);?>
