@@ -8,7 +8,7 @@
 $(document).ready(function(){
 //	$('table.zebra tbody > tr:nth-child(odd)').addClass('alt');
 	
-	var dates = $( "#txtReportDateStart, #txtReportDateEnd" ).datepicker({
+	var dates = $( "#txtReportDateStart" ).datepicker({
 			defaultDate: "+1w",
 			changeMonth: true,
 			numberOfMonths: 1,
@@ -22,8 +22,14 @@ $(document).ready(function(){
 						selectedDate, instance.settings );
 				dates.not( this ).datepicker( "option", option, date );
 			}
-			});
+	});
+	dates.closest('body').find('#ui-datepicker-div').wrap('<span class="UITheme"></span>');
 
+		$('#frmGenerate').attr('target', '_blank'); //open the form in a new window
+		$('#frmGenerate').attr('action','<?php echo site_url('aweajax/awe_count_output') ?>');
+		$('#frmGenerate').get(0).setAttribute('action', '<?php echo site_url('aweajax/awe_count_output') ?>');
+	
+	
 });
 
 </script>

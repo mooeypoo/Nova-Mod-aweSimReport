@@ -4,20 +4,21 @@
 
 <?php echo text_output($header, 'h1', 'page-head');?>
 
-<?php echo form_open('awesimreport/count'); ?>
+<?php echo form_open('aweajax/awe_count_output', $inputs['formAttributes']); ?>
 
 	<input type="hidden" name="action" value="generate_count" />
 
 	<div class="indent-left">
 	<!--span class="UITheme" -->
 		<kbd><?php echo form_label('Report Date:', 'txtReportDateStart');?><?php echo form_input($inputs['txtReportDateStart']); ?></kbd>
-		<kbd>Report Duration: <?php echo form_dropdown('selReportDuration',$inputs['selReportDuration'],'7'); /*form_input($inputs['txtReportDuration']);*/ ?> Days</kbd>
-		<kbd>Backwards Count: <?php echo form_dropdown('selBackwardsCount',$inputs['selBackwardsCount'],'5');?></kbd>
+		<kbd>Report Duration: <?php echo form_dropdown('selReportDuration',$inputs['selReportDuration'],'7'); /*form_input($inputs['txtReportDuration']);*/ ?></kbd>
+		<kbd>Backwards Count: <?php echo form_dropdown('selBackwardsCount',$inputs['selBackwardsCount'],'2');?></kbd>
 		<small>This will show a history of log count, per report duration.  Choosing 1 will include another count duration back, choosing 2 will show two back, etc.</small>
 	</span>
 	<!-- /div -->
 
 	<hr />
+	<small>To remove someone from the roster, uncheck their character.</small>
 
 	<?php if (isset($roster['manifest'])): ?>
 		<?php foreach ($roster['manifest'] as $manif): ?>
@@ -28,7 +29,7 @@
 						<table class="" cellpadding="3" border="0">
 						
 						<?php foreach ($manif['depts'] as $dept): ?>
-							<?php if (isset($dept['pos'])): ?>
+							<?php if (isset($dept['pos']) && count($dept['pos'])>0): ?>
 								<tr>
 									<td colspan="5"><h3><?php echo $dept['name'];?></h3></td>
 								</tr>
@@ -125,7 +126,8 @@
 		<?php endforeach; //manifests ?>
 		<?php endif; //manifests ?>
 	
-	
+	<br />
+		<center><?php echo form_button($inputs['butGenerate']);?></center>
 	
 	
 	
