@@ -13,7 +13,7 @@
 		<kbd><?php echo form_label('Report Date:', 'txtReportDateStart');?><?php echo form_input($inputs['txtReportDateStart']); ?></kbd>
 		<kbd>Report Duration: <?php echo form_dropdown('selReportDuration',$inputs['selReportDuration'],'7'); /*form_input($inputs['txtReportDuration']);*/ ?> Days</kbd>
 		<kbd>Backwards Count: <?php echo form_dropdown('selBackwardsCount',$inputs['selBackwardsCount'],'5');?></kbd>
-		<small>This will count logs repetitively, according to report duration, backwards, to produce a log history for each member.</small>
+		<small>This will show a history of log count, per report duration.  Choosing 1 will include another count duration back, choosing 2 will show two back, etc.</small>
 	</span>
 	<!-- /div -->
 
