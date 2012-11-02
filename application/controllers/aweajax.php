@@ -318,10 +318,12 @@ tr.totals {
 	padding:0px 2px;
 	font-size: 16px;
 	font-weight: bold;
-	text-align: right;
 	background-color: #cfcfcf;
+	text-align: center;
 }
-
+totals th {
+	text-align: right ;
+}
 td.lowlimit {
 	color: #E01B1B;
 }
@@ -426,7 +428,7 @@ td.lowlimit {
 				
 		<?php endforeach; //manifests ?>
 		<tr class="totals">
-			<td colspan='2' valign="right">Total:</td>
+			<th colspan='2' class="">Total:</th>
 		<?php
 			// SHOW TOTALS:
 			foreach ($totals as $key => $value) { ?>
