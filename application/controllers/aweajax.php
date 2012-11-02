@@ -25,7 +25,6 @@ class Aweajax extends Nova_ajax {
 	 */
 	function awe_count_output() {
 
-		print "Log count: ";
 		// load the models
 		$this->load->model('awesimreport_model', 'awe');
 		$this->load->model('characters_model', 'char');
@@ -42,10 +41,8 @@ class Aweajax extends Nova_ajax {
 		$tReportDuration = $this->input->post('selReportDuration', TRUE);
 		$tBackwardsCount = $this->input->post('selBackwardsCount', TRUE);
 		$tCharChecks = $this->input->post('chkCount', TRUE);
-		//print "<hr>".$tReportStart."<hr>";
 
 		$tReportStart = strtotime($tReportStart); //convert to epoch
-//		print "<hr>".$tReportStart."<hr>";
 		$tReportEnd = ($tReportDuration * 24 * 60 * 60); //translate to sections
 		$tReportEnd = $tReportStart + $tReportEnd;
 		//get the rosters again:
@@ -311,7 +308,7 @@ td.lowlimit {
 	color: #E01B1B;
 }
 </style>
-
+<br /><br />
 	<?php if (isset($roster['manifest'])): ?>
 		<table class="roster">
 		<tr>
@@ -413,8 +410,7 @@ td.lowlimit {
 		</table>
 		<?php endif; //manifests ?>
 	
-	
-	<hr><hr>
+<br /><br /><br /><br />	
 <?php		
 		//print_r($roster);
 	} // end awe_count_output();
