@@ -38,6 +38,10 @@ SAVE!
 Enjoy. 
 
 ## Version
+### Version 1.2
+* Fixed database prefix bug in awesimreport model
+* Fixed problem presenting LOA members.
+
 ### Version 1.1
 * Fixed bug related to single manifest (didn't show correctly). Thanks Jaeger!
 

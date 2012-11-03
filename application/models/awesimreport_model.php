@@ -20,14 +20,16 @@ class Awesimreport_model extends CI_Model {
 
 	//GET USER POSTS
 	public function count_user_posts($user_id, $start_date, $duration, $iteration = 1) {
-
+		$this->load->database();
+		$dbprefix = $this->db->dbprefix;
+		
 		$string = "(post_authors_users LIKE '%,$user_id' OR post_authors_users LIKE '$user_id,%' OR post_authors_users = '%,$user_id,%' OR post_authors_users = $user_id)";
 
 		$duration = $duration * 24 * 60 * 60; //translate to epoch seconds
 		$en_date = $start_date;
 		$st_date = $start_date - $duration;
 		for ($i=1; $i<=$iteration; $i++) {
-			$querystr[] = "SELECT * FROM nova_posts WHERE ".$string;
+			$querystr[] = "SELECT * FROM ".$dbprefix."posts WHERE ".$string;
 			$querystr[] = "AND post_date > ".$st_date;
 			$querystr[] = "AND post_date <= ".$en_date;
 

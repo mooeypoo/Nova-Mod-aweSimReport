@@ -130,10 +130,7 @@ class Aweajax extends Nova_ajax {
 														// set the color
 														$color = '';
 														
-														if ($char->user > 0) {
-															$color = ($this->user->get_loa($char->user) == 'loa') ? '_loa' : $color;
-															$color = ($this->user->get_loa($char->user) == 'eloa') ? '_eloa' : $color;
-														}
+															$loastatus = $this->user->get_loa($char->user) == 'loa';
 														
 														// get the character name and rank
 														$name = $this->char->get_character_name($char->charid, true);
@@ -147,18 +144,14 @@ class Aweajax extends Nova_ajax {
 																$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['name'] = $name;
 																$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['rank_img'] = $rank_img;
 																$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['crew_type'] = $char->crew_type;
+																$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['loa_status'] = $loastatus;
 																// GET COUNT:
-																if (($this->user->get_loa($char->user) == 'loa') || ($this->user->get_loa($char->user) == 'eloa')) {
-																	$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['logcount'] = $this->user->get_loa($char->user);
-																} else {
-//																	$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['logcount'] = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
 																	$logcount = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
 																	$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['logcount'] = $logcount;
 																	//add to totals:
 																	foreach ($logcount as $key => $value) {
 																		$totals[$key] += $value;
 																	}
-																}
 															}
 															if (!isset($logDates)) {
 																$logDates = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
@@ -218,25 +211,24 @@ class Aweajax extends Nova_ajax {
 												
 												// get the character name and rank
 												$name = $this->char->get_character_name($char->charid, true);
-												
+												$loastatus = $this->user->get_loa($char->user) == 'loa';
+
 												if ($char->crew_type == 'active' and empty($char->user)) {
 													// don't do anything
 												} else {
 													if (in_array($char->charid, $tCharChecks)) {
 														// set the data for characters in a position in the dept
+														$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['loa_status'] = $loastatus;
 														$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['char_id'] = $char->charid;
 														$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['name'] = $name;
 														$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['rank_img'] = $rank_img;
 														$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['crew_type'] = $char->crew_type;
-														if (($this->user->get_loa($char->user) == 'loa') || ($this->user->get_loa($char->user) == 'eloa')) {
-															$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['logcount'] = $this->user->get_loa($char->user);
-														} else {
-															$logcount = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
-															$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['logcount'] = $logcount;
-															//add to totals:
-															foreach ($logcount as $key => $value) {
-																$totals[$key] += $value;
-															}
+														
+														$logcount = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
+														$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['logcount'] = $logcount;
+														//add to totals:
+														foreach ($logcount as $key => $value) {
+															$totals[$key] += $value;
 														}
 													}
 													if (!isset($logDates)) {
@@ -366,14 +358,20 @@ td.lowlimit {
 													<strong class="fontMedium"><?php echo $char['name'];?></strong><br />
 													<?php echo $pos['name'];?>
 												</td>
-<?php 											foreach ($char['logcount'] as $key => $lc) { 
-													$countstyle ='';
-													if ($lc == 0) { $countstyle = 'lowlimit'; }
+<?php											if (($char['loa_status'] == 'loa')  || ($char['loa_status'] == 'eloa')) { ?>
+													<td colspan="100"><?php echo $char['loa_status']; ?></td>
+<?php											} else {
+													foreach ($char['logcount'] as $key => $lc) { 
+														$countstyle ='';
+														if ($lc == 0) { $countstyle = 'lowlimit'; }
+														
+														?>													
+														<td class="col_75 align_right <?php echo $countstyle;?>">
+															<?php echo $lc; ?>
+														</td>
+<?php												} 
+												}
 ?>
-													<td class="col_75 align_right <?php echo $countstyle;?>">
-														<?php echo $lc; ?>
-													</td>
-<?php											} ?>
 											</tr>
 										<?php endforeach; ?>
 									<?php endif; ?>
@@ -401,14 +399,20 @@ td.lowlimit {
 															<strong class="fontMedium"><?php echo $char['name'];?></strong><br />
 															<?php echo $spos['name'];?>
 														</td>
-		<?php 											foreach ($char['logcount'] as $key => $lc) { 
-															$countstyle ='';
-															if ($lc == 0) { $countstyle = 'lowlimit'; }
-		?>
-															<td class="col_75 align_right <?php echo $countstyle; ?>">
-																<?php echo $lc; ?>
-															</td>
-		<?php											} ?>
+			<?php											if (($char['loa_status'] == 'loa')  || ($char['loa_status'] == 'eloa')) { ?>
+																<td colspan="100"><?php echo $char['loa_status']; ?></td>
+			<?php											} else {
+																foreach ($char['logcount'] as $key => $lc) { 
+																	$countstyle ='';
+																	if ($lc == 0) { $countstyle = 'lowlimit'; }
+																	
+																	?>													
+																	<td class="col_75 align_right <?php echo $countstyle;?>">
+																		<?php echo $lc; ?>
+																	</td>
+			<?php												} 
+															}
+			?>
 													</tr>
 												<?php endforeach; ?>
 											<?php endif; ?>
