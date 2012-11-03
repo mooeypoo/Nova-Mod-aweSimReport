@@ -11,7 +11,11 @@
 */
 ?>
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');?>
-
+<style>
+.npc {
+	background-color: #222;
+}
+</style>
 <div id='ajaxnotice' class='hidden'></div>
 
 <?php echo text_output($header, 'h1', 'page-head');?>
@@ -26,6 +30,8 @@
 		<kbd>Report Duration: <?php echo form_dropdown('selReportDuration',$inputs['selReportDuration'],'7'); /*form_input($inputs['txtReportDuration']);*/ ?></kbd>
 		<kbd>Backwards Count: <?php echo form_dropdown('selBackwardsCount',$inputs['selBackwardsCount'],'2');?></kbd>
 		<small>This will show a history of log count, per report duration.  Choosing 1 will include another count duration back, choosing 2 will show two back, etc.</small>
+		<kbd>Separate NPC Log Count: <?php echo form_dropdown('selSepNPCs',$inputs['selSepNPCs'],'n', "id='selSepNPCs'");?></kbd>
+
 	</span>
 	<!-- /div -->
 
@@ -49,13 +55,8 @@
 								
 									<?php if (isset($pos['chars'])): ?>
 										<?php foreach ($pos['chars'] as $char): ?>
-											<?php if ($char['crew_type'] == 'inactive'): ?>
-												<?php $display = ' hidden'; ?>
-											<?php else: ?>
-												<?php $display = ''; ?>
-											<?php endif; ?>
 									
-											<tr class="fontSmall <?php echo $char['crew_type'] . $display;?>">
+											<tr class="fontSmall <?php echo $char['crew_type']?>">
 												<td class="col_15"></td>
 												<td class="col_150"><?php echo img($char['rank_img']);?></td>
 												<td>
@@ -67,11 +68,13 @@
 													<?php elseif ($char['crew_type'] == 'inactive'): ?>
 														<br /><?php echo text_output($label['inactive'], 'span', 'gray');?>
 													<?php endif; ?>
+<?php 												if ($char['crew_type'] == 'npc') { ?>
+														<span class="npc">(Played by <?php echo $char['main_char'] ?>)</span>
+<?php												} ?>
 												</td>
 												<td></td>
 												<td class="col_75 align_right">
 													<?php echo form_checkbox($char['inpcheck']); ?>
-													<?php //echo anchor('personnel/character/'. $char['char_id'], img($char['combadge']), array('class' => 'bold image'));?>
 												</td>
 											</tr>
 										<?php endforeach; ?>
@@ -93,13 +96,7 @@
 										
 											<?php if (isset($spos['chars'])): ?>
 												<?php foreach ($spos['chars'] as $char): ?>
-													<?php if ($char['crew_type'] == 'inactive'): ?>
-														<?php $display = ' hidden'; ?>
-													<?php else: ?>
-														<?php $display = ''; ?>
-													<?php endif; ?>
-											
-													<tr class="fontSmall <?php echo $char['crew_type'] . $display;?>">
+													<tr class="fontSmall <?php echo $char['crew_type']?>">
 														<td class="col_15"></td>
 														<td class="col_150"><?php echo img($char['rank_img']);?></td>
 														<td>
@@ -111,6 +108,9 @@
 															<?php elseif ($char['crew_type'] == 'inactive'): ?>
 																<br /><?php echo text_output($label['inactive'], 'span', 'gray');?>
 															<?php endif; ?>
+<?php 												if ($char['crew_type'] == 'npc') { ?>
+														<span class="npc">(Played by <?php echo $char['main_char'] ?>)</span>
+<?php												} ?>
 														</td>
 														<td></td>
 														<td class="col_75 align_right">
@@ -147,7 +147,5 @@
 	
 <?php echo form_close();?>
 	
-<hr />
 <?php //print_r($roster); ?>
 
-<hr />

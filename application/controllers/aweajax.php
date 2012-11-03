@@ -41,7 +41,10 @@ class Aweajax extends Nova_ajax {
 		$tReportDuration = $this->input->post('selReportDuration', TRUE);
 		$tBackwardsCount = $this->input->post('selBackwardsCount', TRUE);
 		$tCharChecks = $this->input->post('chkCount', TRUE);
+		$tSepNPCs = $this->input->post('selSepNPCs', TRUE);
 
+		//print_r($tCharChecks);
+		
 		$tReportStart = strtotime($tReportStart); //convert to epoch
 		$tReportEnd = ($tReportDuration * 24 * 60 * 60); //translate to sections
 		$tReportEnd = $tReportStart + $tReportEnd;
@@ -99,7 +102,11 @@ class Aweajax extends Nova_ajax {
 										$b = 1;
 										foreach ($positions->result() as $pos) {
 											// get any characters in a position in a sub dept
-											$characters = $this->awe->get_characters_for_position($pos->pos_id, array('rank' => 'asc'));
+											if ($tSepNPCs == 'n') { //don't separate npc from count
+												$characters = $this->awe->get_characters_for_position($pos->pos_id, array('rank' => 'asc'));
+											} else {
+												$characters = $this->char->get_characters_for_position($pos->pos_id, array('rank' => 'asc'));
+											}
 											
 											if ($characters->num_rows() > 0) {
 												// set the name of the sub dept
@@ -112,8 +119,8 @@ class Aweajax extends Nova_ajax {
 												$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['blank_img'] = $blank_img;
 												$c = 1;
 												foreach ($characters->result() as $char) {
-													//skip NPCs
-													if ($char->crew_type != 'npc') {
+													//ignore position_2
+													if ($char->position_2 != $pos->pos_id) {
 														// grab the rank data we need
 														$rankdata = $this->ranks->get_rank($char->rank, array('rank_name', 'rank_image'));
 														
@@ -138,28 +145,41 @@ class Aweajax extends Nova_ajax {
 														if ($char->crew_type == 'active' and empty($char->user)) {
 															// don't do anything
 														} else {
-															if (in_array($char->charid, $tCharChecks)) {
+//															if (in_array($char->charid, $tCharChecks)) {
 																// set the data for the characters in a position in a sub dept
 																$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['char_id'] = $char->charid;
 																$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['name'] = $name;
 																$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['rank_img'] = $rank_img;
 																$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['crew_type'] = $char->crew_type;
 																$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['loa_status'] = $loastatus;
+																unset($maincharname);
+																unset($tmainchar);
+																unset($mainchar);
+																if ($char->crew_type == 'npc') {
+																	$tmainchar = $this->char->get_user_characters($char->user,'active');
+																	$mainchar = $tmainchar->row();
+																	$maincharname = $this->char->get_character_name($mainchar->charid,true,false);
+																	$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['main_char'] = $maincharname;
+																}
 																// GET COUNT:
-																	$logcount = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
+																	if ($tSepNPCs == 'n') { //don't separate npc from count
+																		$logcount = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
+																	} else { //separate count per character
+																		$logcount = $this->awe->count_char_posts($char->charid, $tReportStart, $tReportDuration, $tBackwardsCount);
+																	}
 																	$roster['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['logcount'] = $logcount;
 																	//add to totals:
 																	foreach ($logcount as $key => $value) {
 																		$totals[$key] += $value;
 																	}
-															}
-															if (!isset($logDates)) {
-																$logDates = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
-															}
+																if (!isset($logDates)) {
+																	$logDates = $logcount;
+																}
+//															}
 															
 															++$c;
 														}
-													} // end if not npc
+													} // end ignore position_2
 												}
 											}
 											
@@ -179,7 +199,12 @@ class Aweajax extends Nova_ajax {
 								$b = 1;
 								foreach ($positions->result() as $pos) {
 									// get any characters in a position in the dept
-									$characters = $this->awe->get_characters_for_position($pos->pos_id, array('rank' => 'asc'));
+									if ($tSepNPCs == 'n') { //don't separate npc from count
+										$characters = $this->awe->get_characters_for_position($pos->pos_id, array('rank' => 'asc'));
+									} else {
+										$characters = $this->char->get_characters_for_position($pos->pos_id, array('rank' => 'asc'));
+									}
+											
 									
 									if ($characters->num_rows() > 0) {
 										// set the dept name
@@ -194,8 +219,9 @@ class Aweajax extends Nova_ajax {
 										
 										$c = 1;
 										foreach ($characters->result() as $char) {
-											//check char is not NPC
-											if ($char->crew_type != 'npc') {
+										//ignore chars whose post2 is this dept:
+											if ($char->position_2 != $pos->pos_id) {
+										
 												// get the rank data we need
 												$ranksdata = $this->ranks->get_rank($char->rank, array('rank_name', 'rank_image'));
 												
@@ -216,27 +242,39 @@ class Aweajax extends Nova_ajax {
 												if ($char->crew_type == 'active' and empty($char->user)) {
 													// don't do anything
 												} else {
-													if (in_array($char->charid, $tCharChecks)) {
+//													if (in_array($char->charid, $tCharChecks)) {
 														// set the data for characters in a position in the dept
 														$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['loa_status'] = $loastatus;
 														$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['char_id'] = $char->charid;
 														$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['name'] = $name;
 														$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['rank_img'] = $rank_img;
 														$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['crew_type'] = $char->crew_type;
-														
-														$logcount = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
+														unset($maincharname);
+														unset($tmainchar);
+														unset($mainchar);
+														if ($char->crew_type == 'npc') {
+															$tmainchar = $this->char->get_user_characters($char->user,'active');
+															$mainchar = $tmainchar->row();
+															$maincharname = $this->char->get_character_name($mainchar->charid,true,false);
+															$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['main_char'] = $maincharname;
+														}
+														if ($tSepNPCs == 'n') { //don't separate npc from count
+															$logcount = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
+														} else { //separate count per character
+															$logcount = $this->awe->count_char_posts($char->charid, $tReportStart, $tReportDuration, $tBackwardsCount);
+														}
 														$roster['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['logcount'] = $logcount;
 														//add to totals:
 														foreach ($logcount as $key => $value) {
 															$totals[$key] += $value;
 														}
-													}
-													if (!isset($logDates)) {
-														$logDates = $this->awe->count_user_posts($char->user, $tReportStart, $tReportDuration, $tBackwardsCount);
-													}
+														if (!isset($logDates)) {
+															$logDates = $logcount;
+														}
+//													}
 													++$c;
 												}
-											} // end if not npc
+											} // end ignore position_2
 										}
 									}
 									++$b;
@@ -323,12 +361,14 @@ strong.loa {
 	color: #E01B1B;
 	font-size: 12px;
 }
+.char_npc {
+	background-color: #DAE6EB;
+}
 </style>
 <br /><br />
 	<?php if (isset($roster['manifest'])): ?>
 		<table class="roster">
 		<tr>
-			<?php /*<th>rank</th>*/ ?>
 			<th colspan=2>Character Name</th>
 			<th colspan="<?php echo ($tBackwardsCount+1); ?>">Log Count</th>
 		</tr>
@@ -355,9 +395,7 @@ strong.loa {
 								
 									<?php if (isset($pos['chars'])): ?>
 										<?php foreach ($pos['chars'] as $char): ?>
-											<tr class="fontSmall">
-<?php /*										<td class="col_15"></td> */ ?>
-												<?php /*<td class="col_150"><?php echo img($char['rank_img']);?></td>*/ ?>
+											<tr class="fontSmall char_<?php echo $char['crew_type']; ?>">
 												<td colspan=2>
 													<strong class="fontMedium"><?php echo $char['name'];?></strong><br />
 													<?php echo $pos['name'];?>
@@ -366,6 +404,9 @@ strong.loa {
 																<strong class="loa"><?php echo " [ ".strtoupper($char['loa_status'])." ]"; ?></strong>
 			<?php											} 
 													?>
+<?php 												if ($char['crew_type'] == 'npc') { ?>
+														<br /><span class="npc">(Played by <?php echo $char['main_char'] ?>)</span>
+<?php												} ?>
 												</td>
 <?php												foreach ($char['logcount'] as $key => $lc) { 
 														$countstyle ='';
@@ -398,17 +439,19 @@ strong.loa {
 										
 											<?php if (isset($spos['chars'])): ?>
 												<?php foreach ($spos['chars'] as $char): ?>
-													<tr class="fontSmall">
+													<tr class="fontSmall char_<?php echo $char['crew_type']; ?>">
 													<td class="col_15"></td>
-<?php /*														<td class="col_150"><?php echo img($char['rank_img']);?></td>*/ ?>
 														<td>
-															<strong class="fontMedium"><?php echo $char['name']."(".$char['loa_status'].")";?></strong><br />
+															<strong class="fontMedium"><?php echo $char['name'];?></strong><br />
 															<?php echo $spos['name'];?>
 															<?php
 																	if (($char['loa_status'] == 'loa')  || ($char['loa_status'] == 'eloa')) { ?>
 																		<strong class="loa"><?php echo " [ ".strtoupper($char['loa_status'])." ]"; ?></strong>
 					<?php											} 
 															?>
+		<?php 												if ($char['crew_type'] == 'npc') { ?>
+																<br /><span class="npc">(Played by <?php echo $char['main_char'] ?>)</span>
+		<?php												} ?>
 														</td>
 <?php
 																foreach ($char['logcount'] as $key => $lc) { 
@@ -450,9 +493,10 @@ strong.loa {
 		</tr>
 		</table>
 		<?php endif; //manifests ?>
-	
+
 <br /><br /><br /><br />	
 <?php		
+		//print "<hr>";
 		//print_r($roster);
 	} // end awe_count_output();
 }

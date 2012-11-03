@@ -1,5 +1,4 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
 /*
 |---------------------------------------------------------------
 | aweSimReport Controller
@@ -60,6 +59,10 @@ class Awesimreport extends Nova_admin {
                   '4'  => '4',
                   '5'  => '5',
 				);
+		$seloptions3 = array(
+                  'n'  => 'Combine NPC log count with main character',
+                  'y'  => 'Show NPCs separately',
+				);
 		
 		$data['inputs'] = array(
 			'formAttributes' => array(
@@ -74,10 +77,11 @@ class Awesimreport extends Nova_admin {
 			'txtReportDuration' => array(
 				'style' => 'width:150px;',
 				'name' => 'txtReportDuration',
-				'id' => 'txtReportDuration',
-				'value' => $inputVal['txtReportDuration']),
+//				'value' => $inputVal['txtReportDuration'],
+				'id' => 'txtReportDuration'),
 			'selReportDuration' => $seloptions,
 			'selBackwardsCount' => $seloptions2,
+			'selSepNPCs' => $seloptions3,
 			'butGenerate' => array(
 				'type' => 'submit',
 				'class' => 'button-main',
@@ -91,7 +95,6 @@ class Awesimreport extends Nova_admin {
 		$manifests = $this->dept->get_all_manifests();
 		
 		if ($manifests->num_rows() > 0) {
-//			if ($manifests->num_rows() > 1) {
 				foreach ($manifests->result() as $m) {
 					$data['manifests'][$m->manifest_id] = array(
 						'id' => $m->manifest_id,
@@ -121,10 +124,6 @@ class Awesimreport extends Nova_admin {
 							// set the dept id as a variable
 							$dept = $depts->dept_id;
 							
-/*							// set the dept name
-							$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['name'] = $depts->dept_name;
-							$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['type'] = $depts->dept_type;
-*/							
 							// get the sub depts
 							$subdepts = $this->dept->get_sub_depts($dept);
 							if ($subdepts->num_rows() > 0) {
@@ -139,7 +138,8 @@ class Awesimreport extends Nova_admin {
 										$b = 1;
 										foreach ($positions->result() as $pos) {
 											// get any characters in a position in a sub dept
-											$characters = $this->awe->get_characters_for_position($pos->pos_id, array('rank' => 'asc'));
+//											$characters = $this->awe->get_characters_for_position($pos->pos_id, array('rank' => 'asc'));
+											$characters = $this->char->get_characters_for_position($pos->pos_id, array('rank' => 'asc'));
 											
 											if ($characters->num_rows() > 0) {
 												// set the name of the sub dept
@@ -152,8 +152,8 @@ class Awesimreport extends Nova_admin {
 												$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['blank_img'] = $blank_img;
 												$c = 1;
 												foreach ($characters->result() as $char) {
-													//skip NPCs
-													if ($char->crew_type != 'npc') {
+													//ignore position_2
+													if ($char->position_2 != $pos->pos_id) {
 														// grab the rank data we need
 														$rankdata = $this->ranks->get_rank($char->rank, array('rank_name', 'rank_image'));
 														
@@ -166,13 +166,6 @@ class Awesimreport extends Nova_admin {
 															'alt' => $rankdata['rank_name'],
 															'class' => 'image');
 															
-														// set the color
-														$color = '';
-														
-														if ($char->user > 0) {
-															$color = ($this->user->get_loa($char->user) == 'loa') ? '_loa' : $color;
-															$color = ($this->user->get_loa($char->user) == 'eloa') ? '_eloa' : $color;
-														}
 														
 														// get the character name and rank
 														$name = $this->char->get_character_name($char->charid, true);
@@ -180,8 +173,6 @@ class Awesimreport extends Nova_admin {
 														if ($char->crew_type == 'active' and empty($char->user)) {
 															// don't do anything
 														} else {
-															//GET LOG COUNT:
-															//$postlist = $awe->count_user_posts($char->user);
 															// set the data for the characters in a position in a sub dept
 															$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['char_id'] = $char->charid;
 															$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['name'] = $name;
@@ -193,18 +184,23 @@ class Awesimreport extends Nova_admin {
 																																											'value' => $char->charid,
 																																											'checked' => TRUE,
 																																											);
-			//												$data['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['combadge'] = $cb_img;
-															
+															unset($maincharname);
+															unset($tmainchar);
+															unset($mainchar);
+															if ($char->crew_type == 'npc') {
+																$tmainchar = $this->char->get_user_characters($char->user,'active');
+																$mainchar = $tmainchar->row();
+																$maincharname = $this->char->get_character_name($mainchar->charid,true,false);
+																$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['sub'][$a]['pos'][$b]['chars'][$c]['main_char'] = $maincharname;
+															}
 															++$c;
 														}
-													} // end if not npc
-												}
-											}
-											
+													}//end ignore position_2
+												}//foreach chars
+											}//if chars numrows>0
 											++$b;
-										}
-									}
-									
+										}//foreach positions
+									} //if positions numrows >0
 									++$a;
 								} //foreach subepts 
 							} //subdepts >0
@@ -217,7 +213,8 @@ class Awesimreport extends Nova_admin {
 								$b = 1;
 								foreach ($positions->result() as $pos) {
 									// get any characters in a position in the dept
-									$characters = $this->awe->get_characters_for_position($pos->pos_id, array('rank' => 'asc'));
+//									$characters = $this->awe->get_characters_for_position($pos->pos_id, array('rank' => 'asc'));
+									$characters = $this->char->get_characters_for_position($pos->pos_id, array('rank' => 'asc'));
 									
 									if ($characters->num_rows() > 0) {
 										// set the dept name
@@ -232,8 +229,8 @@ class Awesimreport extends Nova_admin {
 										
 										$c = 1;
 										foreach ($characters->result() as $char) {
-											//check char is not NPC
-											if ($char->crew_type != 'npc') {
+											//ignore position_2
+											if ($char->position_2 != $pos->pos_id) {
 												// get the rank data we need
 												$ranksdata = $this->ranks->get_rank($char->rank, array('rank_name', 'rank_image'));
 												
@@ -246,26 +243,6 @@ class Awesimreport extends Nova_admin {
 													'alt' => $ranksdata['rank_name'],
 													'class' => 'image');
 												
-												// set the color
-			/*									$color = '';
-												
-												if ($char->user > 0)
-												{
-													$color = ($this->user->get_loa($char->user) == 'loa') ? '_loa' : $color;
-													$color = ($this->user->get_loa($char->user) == 'eloa') ? '_eloa' : $color;
-												}
-												
-												$color = ($char->crew_type == 'inactive') ? '' : $color;
-												$color = ($char->crew_type == 'npc') ? '_npc' : $color;
-												
-												// build the combadge image array
-												$cb_img = array(
-													'src' => Location::cb('combadge'. $color .'.png', $this->skin, 'main'),
-													'alt' => ucwords(lang('actions_view') 
-														.' '. lang('labels_bio')),
-													'class' => 'image'
-												);
-			*/									
 												// get the character name and rank
 												$name = $this->char->get_character_name($char->charid, true);
 												
@@ -283,11 +260,18 @@ class Awesimreport extends Nova_admin {
 																																						'value' => $char->charid,
 																																						'checked' => TRUE,
 																																						);
-			//										$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['combadge'] = $cb_img;
-													
+														unset($maincharname);
+														unset($tmainchar);
+														unset($mainchar);
+															if ($char->crew_type == 'npc') {
+																$tmainchar = $this->char->get_user_characters($char->user,'active');
+																$mainchar = $tmainchar->row();
+																$maincharname = $this->char->get_character_name($mainchar->charid,true,false);
+																$data['roster']['manifest'][$m->manifest_id]['depts'][$dept]['pos'][$b]['chars'][$c]['main_char'] = $maincharname;
+															}
 													++$c;
 												}
-											} // end if not npc
+											} // end ignore position_2
 										}
 									}
 									
@@ -303,12 +287,8 @@ class Awesimreport extends Nova_admin {
 						
 						} //foreach depts
 					} //if depts > 0
-			
-					
-					
-					
+								
 				} //foreach manifest
-//			} //if manifest >1
 			
 		} //if manifest>0
 
@@ -321,7 +301,4 @@ class Awesimreport extends Nova_admin {
 		Template::render();
 	}
 	
-	public function count_results() {
-		print "Blah.";
-	}
 }

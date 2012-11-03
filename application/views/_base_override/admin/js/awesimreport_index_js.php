@@ -36,6 +36,18 @@ $(document).ready(function(){
 	});
 	dates.closest('body').find('#ui-datepicker-div').wrap('<span class="UITheme"></span>');
 
+	var NPCs = $("#selSepNPCs").val();
+	if (NPCs == 'n') {
+		$(".npc").hide();
+	}
+	$("#selSepNPCs").change(function() {
+		if ($(this).val() == 'n') {
+			$(".npc").fadeOut();
+		} else {
+			$(".npc").fadeIn();
+		}
+	});
+	
 		$('#frmGenerate').attr('target', '_blank'); //open the form in a new window
 		$('#frmGenerate').attr('action','<?php echo site_url('aweajax/awe_count_output') ?>');
 		$('#frmGenerate').get(0).setAttribute('action', '<?php echo site_url('aweajax/awe_count_output') ?>');

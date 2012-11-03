@@ -30,6 +30,7 @@ class Awesimreport_model extends CI_Model {
 		$st_date = $start_date - $duration;
 		for ($i=1; $i<=$iteration; $i++) {
 			$querystr[] = "SELECT * FROM ".$dbprefix."posts WHERE ".$string;
+			$querystr[] = "AND post_status = 'activated'";
 			$querystr[] = "AND post_date > ".$st_date;
 			$querystr[] = "AND post_date <= ".$en_date;
 
@@ -37,22 +38,7 @@ class Awesimreport_model extends CI_Model {
 			$query = $this->db->query($rawquery);
 
 			$postnum[$en_date] = $query->num_rows();
-/*			//if 0, check if user was on loa:
-			if ($postnum[$en_date] == 0) {
-				$this->db->select('loa');
-				$this->db->from('users');
-				$this->db->where('userid', $id);
-				$loaquery = $this->db->get();
-				
-				if ($loaquery->num_rows() > 0)
-				{
-					$row = $loaquery->row();
-					if ($row->loa) {
-						$postnum[$en_date] = $row->loa;
-					}
-				}
-			}
-*/
+
 			$en_date = $st_date;
 			$st_date = $st_date - $duration;
 			unset($querystr);
@@ -61,6 +47,37 @@ class Awesimreport_model extends CI_Model {
 		return $postnum;
 		
 	}
+
+	//GET CHAR POSTS
+	public function count_char_posts($char_id, $start_date, $duration, $iteration = 1) {
+		$this->load->database();
+		$dbprefix = $this->db->dbprefix;
+		
+		$string = "(post_authors LIKE '%,$char_id' OR post_authors LIKE '$char_id,%' OR post_authors = '%,$char_id,%' OR post_authors = $char_id)";
+
+		$duration = $duration * 24 * 60 * 60; //translate to epoch seconds
+		$en_date = $start_date;
+		$st_date = $start_date - $duration;
+		for ($i=1; $i<=$iteration; $i++) {
+			$querystr[] = "SELECT * FROM ".$dbprefix."posts WHERE ".$string;
+			$querystr[] = "AND post_status = 'activated'";
+			$querystr[] = "AND post_date > ".$st_date;
+			$querystr[] = "AND post_date <= ".$en_date;
+
+			$rawquery = implode(" ", $querystr);
+			$query = $this->db->query($rawquery);
+
+			$postnum[$en_date] = $query->num_rows();
+
+			$en_date = $st_date;
+			$st_date = $st_date - $duration;
+			unset($querystr);
+		}
+		ksort($postnum);
+		return $postnum;
+		
+	}
+	
 	
 	//GET ALL *PLAYING* ACTIVE CHARS FOR POST:
 	public function get_characters_for_position($position = '', $order = '')
@@ -86,6 +103,5 @@ class Awesimreport_model extends CI_Model {
 		
 		return $query;
 	}
-	
-	
+
 }

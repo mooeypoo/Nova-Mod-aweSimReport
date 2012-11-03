@@ -38,6 +38,9 @@ SAVE!
 Enjoy. 
 
 ## Version
+### Version 1.3
+* Added feature to separately count NPC posts, or combine with main character
+
 ### Version 1.2
 * Fixed database prefix bug in awesimreport model
 * Fixed problem presenting LOA members.
