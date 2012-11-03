@@ -37,6 +37,13 @@ SAVE!
 
 Enjoy. 
 
+## Version
+### Version 1.1
+* Fixed bug related to single manifest (didn't show correctly). Thanks Jaeger!
+
+### Version 1.0
+* Initial extension working.
+
 ## Bug Reports
 If you find any, or have any special requests, please use the 'issues' tab. Please take into account I'm a graduate student with very little time. I'll be doing my very very best to answer bugs and requests, but be patient with me.
 
