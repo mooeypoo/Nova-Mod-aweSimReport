@@ -8,7 +8,32 @@ If I have some more time, I will work on expanding this edition for the future.
 For the moment, the result is printed on a new blank page where you can copy/paste the results into an email.
 
 ## Install
-I took great care to make sure the install is as easy as possible. All files in this edition are completely standalone, which means all you need to do is upload the "application" folder **as-is**.
+I took great care to make sure the install is as easy as possible. 
+All files in this edition are completely standalone, which means all you need to do is upload the "application" folder **as-is**, to 'replace' your website's "application" folder. The files are already in their proper folders.
+
+### To access your brand new extension
+Go to yoursite.com/index.php/awesimreport
+
+### To create a permanent menu item
+* Go to your Control Panel, then to "Menu Items".
+* Click on "Add Menu Item"
+* Fill out the following fields:
+
+```
+Name: aweSimReport Lite
+link: awesimreport
+Link Type: Onsite
+
+Type: Admin Sub Navigation
+Category: Admin Control Panel
+
+Access Control:
+Login Requirement: Must Be Logged In
+Use Access Control: Yes
+Access Control URL: site/settings
+```
+
+SAVE!
 
 Enjoy. 
 
