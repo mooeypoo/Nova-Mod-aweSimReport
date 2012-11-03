@@ -130,7 +130,7 @@ class Aweajax extends Nova_ajax {
 														// set the color
 														$color = '';
 														
-															$loastatus = $this->user->get_loa($char->user) == 'loa';
+															$loastatus = $this->user->get_loa($char->user);
 														
 														// get the character name and rank
 														$name = $this->char->get_character_name($char->charid, true);
@@ -211,7 +211,7 @@ class Aweajax extends Nova_ajax {
 												
 												// get the character name and rank
 												$name = $this->char->get_character_name($char->charid, true);
-												$loastatus = $this->user->get_loa($char->user) == 'loa';
+												$loastatus = $this->user->get_loa($char->user);
 
 												if ($char->crew_type == 'active' and empty($char->user)) {
 													// don't do anything
@@ -319,6 +319,10 @@ totals th {
 td.lowlimit {
 	color: #E01B1B;
 }
+strong.loa {
+	color: #E01B1B;
+	font-size: 12px;
+}
 </style>
 <br /><br />
 	<?php if (isset($roster['manifest'])): ?>
@@ -357,11 +361,13 @@ td.lowlimit {
 												<td colspan=2>
 													<strong class="fontMedium"><?php echo $char['name'];?></strong><br />
 													<?php echo $pos['name'];?>
+													<?php
+															if (($char['loa_status'] == 'loa')  || ($char['loa_status'] == 'eloa')) { ?>
+																<strong class="loa"><?php echo " [ ".strtoupper($char['loa_status'])." ]"; ?></strong>
+			<?php											} 
+													?>
 												</td>
-<?php											if (($char['loa_status'] == 'loa')  || ($char['loa_status'] == 'eloa')) { ?>
-													<td colspan="100"><?php echo $char['loa_status']; ?></td>
-<?php											} else {
-													foreach ($char['logcount'] as $key => $lc) { 
+<?php												foreach ($char['logcount'] as $key => $lc) { 
 														$countstyle ='';
 														if ($lc == 0) { $countstyle = 'lowlimit'; }
 														
@@ -370,7 +376,7 @@ td.lowlimit {
 															<?php echo $lc; ?>
 														</td>
 <?php												} 
-												}
+												
 ?>
 											</tr>
 										<?php endforeach; ?>
@@ -396,12 +402,15 @@ td.lowlimit {
 													<td class="col_15"></td>
 <?php /*														<td class="col_150"><?php echo img($char['rank_img']);?></td>*/ ?>
 														<td>
-															<strong class="fontMedium"><?php echo $char['name'];?></strong><br />
+															<strong class="fontMedium"><?php echo $char['name']."(".$char['loa_status'].")";?></strong><br />
 															<?php echo $spos['name'];?>
+															<?php
+																	if (($char['loa_status'] == 'loa')  || ($char['loa_status'] == 'eloa')) { ?>
+																		<strong class="loa"><?php echo " [ ".strtoupper($char['loa_status'])." ]"; ?></strong>
+					<?php											} 
+															?>
 														</td>
-			<?php											if (($char['loa_status'] == 'loa')  || ($char['loa_status'] == 'eloa')) { ?>
-																<td colspan="100"><?php echo $char['loa_status']; ?></td>
-			<?php											} else {
+<?php
 																foreach ($char['logcount'] as $key => $lc) { 
 																	$countstyle ='';
 																	if ($lc == 0) { $countstyle = 'lowlimit'; }
@@ -411,7 +420,6 @@ td.lowlimit {
 																		<?php echo $lc; ?>
 																	</td>
 			<?php												} 
-															}
 			?>
 													</tr>
 												<?php endforeach; ?>
