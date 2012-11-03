@@ -27,7 +27,7 @@ class Awesimreport_model extends CI_Model {
 		$en_date = $start_date;
 		$st_date = $start_date - $duration;
 		for ($i=1; $i<=$iteration; $i++) {
-			$querystr[] = "SELECT * FROM trlsta_posts WHERE ".$string;
+			$querystr[] = "SELECT * FROM nova_posts WHERE ".$string;
 			$querystr[] = "AND post_date > ".$st_date;
 			$querystr[] = "AND post_date <= ".$en_date;
 
