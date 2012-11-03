@@ -51,7 +51,7 @@ class Aweajax extends Nova_ajax {
 		unset($totals);
 		
 		if ($manifests->num_rows() > 0) {
-			if ($manifests->num_rows() > 1) {
+//			if ($manifests->num_rows() > 1) {
 				foreach ($manifests->result() as $m) {
 					$data['manifests'][$m->manifest_id] = array(
 						'id' => $m->manifest_id,
@@ -254,7 +254,7 @@ class Aweajax extends Nova_ajax {
 						} //foreach depts
 					} //if depts > 0
 				} //foreach manifest
-			} //if manifest >1
+//			} //if manifest >1
 		} //if manifest>0
 	//END ROSTER!
 
